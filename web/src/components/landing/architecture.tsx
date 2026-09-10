@@ -1,9 +1,9 @@
 const rows = [
   { label: "Frontend", value: "Next.js (App Router), TypeScript, Tailwind CSS" },
-  { label: "Wallet & chain", value: "wagmi, viem — Arc Testnet" },
+  { label: "Wallet & chain", value: "genlayer-js — GenLayer Testnet" },
   { label: "Settlement asset", value: "USDC" },
-  { label: "Evaluation layer", value: "GenLayer Intelligent Contract, adapter interface" },
-  { label: "Escrow", value: "Onchain contract, config-driven address" },
+  { label: "Agreement & escrow", value: "GenLayer Intelligent Contract (contract/agentshield.py)" },
+  { label: "Evaluation layer", value: "Same Intelligent Contract, adapter interface in the UI" },
   { label: "Deployment", value: "Vercel" },
 ];
 

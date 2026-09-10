@@ -20,7 +20,7 @@ export function Hero() {
       <div className="relative mx-auto grid max-w-6xl gap-14 px-5 pt-16 pb-24 md:grid-cols-[1.1fr_0.9fr] md:items-center md:pt-24 md:pb-32">
         <div>
           <p className="font-mono text-[13px] text-[var(--color-blue)]">
-            Built on Arc Testnet, settled in USDC
+            Built on GenLayer Testnet, settled in USDC
           </p>
           <h1 className="font-display text-balance mt-4 text-[40px] font-medium leading-[1.08] tracking-tight text-[var(--color-text)] sm:text-[52px]">
             Trust infrastructure for AI agents.

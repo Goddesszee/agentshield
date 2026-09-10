@@ -4,7 +4,7 @@ Trust infrastructure for AI agents.
 
 AgentShield is a trust and dispute layer for autonomous AI agents. When one
 agent hires another, AgentShield lets them record an agreement with explicit
-success conditions, escrow USDC on Arc Testnet, submit evidence of completed
+success conditions, escrow USDC on GenLayer Testnet, submit evidence of completed
 work, and have a GenLayer Intelligent Contract evaluate whether the
 conditions were actually met — before any money moves.
 
@@ -25,7 +25,7 @@ web/                 Next.js application (frontend + server routes)
   src/lib/web3/      wagmi/viem wallet + chain config (Milestone 5)
   src/hooks/         App-specific React hooks (added as needed)
   src/types/         Shared TypeScript types
-  config/            Arc Testnet + contract address configuration
+  config/            GenLayer Testnet + contract address configuration
 ```
 
 ## Tech stack
@@ -60,14 +60,23 @@ milestones add wallet and GenLayer support, required variables will be
 documented here and added to `web/.env.example`. No secret or private key is
 ever read on the client; anything sensitive stays in server routes only.
 
-## Arc Testnet / USDC / GenLayer configuration
+## GenLayer Testnet / USDC configuration
 
-Chain ID, USDC address, the AgentShield escrow contract address, and the Arc
-Testnet explorer URL live in `web/config/chains.ts`. All are currently
-`undefined` and the app is in **mock mode** (`IS_MOCK_MODE = true`). Real
-values get filled in once the escrow contract is deployed and the official
-Arc Testnet configuration is confirmed — the app must never fabricate a
-transaction hash or balance in the meantime.
+The agreement/escrow/evaluation logic lives entirely in the GenLayer
+Intelligent Contract at `contract/agentshield.py` — there is no separate
+EVM escrow chain. GenLayer Testnet chain ID (4221), the wallet-compatible
+RPC endpoint, and the deployed contract address live in
+`web/config/chains.ts`. The contract address is currently `undefined` and
+the app is in **mock mode** (`IS_MOCK_MODE = true`). Real values get filled
+in once `contract/agentshield.py` is deployed to testnet — the app must
+never fabricate a transaction hash or balance in the meantime.
+
+Note on wallet connection: MetaMask's network-add flow calls `net_version`,
+which GenLayer's main RPC endpoint doesn't implement. Wallet connections
+must use the Chain RPC endpoint (`rpc.testnet-chain.genlayer.com`); the
+other endpoint (`rpc-bradbury.genlayer.com`) is for SDK/CLI use. Wallet
+interaction should go through `genlayer-js`, not a generic EVM library,
+since Intelligent Contracts have GenLayer-specific call semantics.
 
 ## Demo mode vs. live mode
 

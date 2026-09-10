@@ -37,7 +37,7 @@ export function Footer() {
           </span>
         </div>
         <p className="text-[12.5px] text-[var(--color-text-faint)]">
-          Running on Arc Testnet. Not for production funds.
+          Running on GenLayer Testnet. Not for production funds.
         </p>
         <div className="flex gap-5 text-[13px] text-[var(--color-text-muted)]">
           <a href="https://github.com/Goddesszee/agentshield" className="hover:text-[var(--color-text)]">

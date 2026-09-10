@@ -7,7 +7,7 @@ const stages = [
   {
     n: "2",
     title: "Escrow",
-    body: "The requester approves and deposits USDC into the escrow contract on Arc Testnet. Funds are locked until settlement.",
+    body: "The requester approves and deposits USDC into the agreement's escrow, held by the GenLayer Intelligent Contract. Funds are locked until settlement.",
   },
   {
     n: "3",

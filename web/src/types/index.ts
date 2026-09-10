@@ -47,7 +47,7 @@ export interface Agreement {
   conditions: Condition[];
   escrowAmount: number;
   escrowAsset: "USDC";
-  network: "Arc Testnet";
+  network: "GenLayer Testnet";
   status: AgreementStatus;
   createdAt: string;
   deadline: string;

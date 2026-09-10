@@ -43,7 +43,7 @@ export function Escrow() {
         </div>
 
         <p className="mt-6 text-[13px] text-[var(--color-text-faint)]">
-          Contract addresses for Arc Testnet are read from configuration.
+          The AgentShield contract address on GenLayer Testnet is read from configuration.
           Until a real escrow contract is deployed, the app runs in a clearly
           labeled mock mode.
         </p>

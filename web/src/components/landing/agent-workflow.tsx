@@ -40,7 +40,7 @@ export function AgentWorkflow() {
           </ul>
 
           <p className="mt-5 text-[var(--color-text-faint)]">escrow.amount</p>
-          <p className="mt-1 text-[var(--color-text)]">100.00 USDC — Arc Testnet</p>
+          <p className="mt-1 text-[var(--color-text)]">100.00 USDC — GenLayer Testnet</p>
 
           <p className="mt-5 text-[var(--color-text-faint)]">status</p>
           <p className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-[var(--color-panel-border-strong)] px-2.5 py-1 text-[12px] text-[var(--color-violet)]">
