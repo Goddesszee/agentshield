@@ -1,116 +1,99 @@
 # AgentShield
 
-**Trust infrastructure for the agentic economy.**
+Trust infrastructure for AI agents.
 
-Escrow, verification, and dispute resolution for AI-agent-to-AI-agent commerce, built on [GenLayer](https://genlayer.com) Intelligent Contracts.
+AgentShield is a trust and dispute layer for autonomous AI agents. When one
+agent hires another, AgentShield lets them record an agreement with explicit
+success conditions, escrow USDC on Arc Testnet, submit evidence of completed
+work, and have a GenLayer Intelligent Contract evaluate whether the
+conditions were actually met — before any money moves.
 
----
+> **Status:** Milestone 1 of a staged rebuild. This is the design system and
+> landing page only. Wallet connection, escrow, evidence submission, and the
+> GenLayer evaluation adapter are scaffolded but not yet implemented — see
+> "Current state" below.
 
-## What's real here and what isn't yet
-
-This is not a mockup. The contract and frontend are written to actually run against GenLayer's live Bradbury testnet. Two things are true at the same time:
-
-1. **The Intelligent Contract (`contract/agentshield.py`) is complete and syntax-checked**, written against the current `docs.genlayer.com` API — not invented, not copied from stale examples.
-2. **It has not been deployed yet.** Deploying requires signing a transaction from a wallet with testnet GEN, either through GenLayer Studio's browser GUI or the `genlayer` CLI running on your machine. Neither is reachable from the sandboxed environment this was built in, so that step is on you — see [Deploying](#deploying) below. Nothing in this repo pretends a deployment happened; `frontend/.env.example` ships with a blank contract address and the app shows an explicit "not configured" banner until you set one.
-
-One naming decision worth flagging: the LLM-evaluation call (`gl.exec_prompt` / `gl.eq_principle_prompt_non_comparative`) was carried forward unchanged from your working `agent-escrow-contract` repo rather than independently re-verified against a live SDK install, since I couldn't install the `py-genlayer` package in this sandbox either. Every other API surface — `gl.message.sender_address`, `gl.message.value`, `Address` as a `TreeMap` key, `@gl.public.write.payable` — was checked directly against current docs pages fetched during this session.
-
----
-
-## How it works
+## Repository structure
 
 ```
-Buyer creates agreement (task, deliverables, acceptance criteria, payment, deadline)
-        ↓
-Seller accepts
-        ↓
-Buyer funds escrow (GEN locked in the contract)
-        ↓
-Seller submits work (URL + evidence)
-        ↓
-GenLayer validators fetch the URL live and evaluate it against the
-acceptance criteria — LLM reasoning validated across independent
-nodes via the equivalence principle
-        ↓
-APPROVED → escrow releases to seller automatically, reputation updates
-DISPUTED → buyer can manually override (release or refund) with a resolution note
+contract/           GenLayer Intelligent Contract (Python)
+web/                 Next.js application (frontend + server routes)
+  src/app/           App Router pages and layout
+  src/components/    UI components (landing/ built; app UI comes later)
+  src/lib/genlayer/  GenLayer adapter interface + demo evaluator
+  src/lib/contracts/ Escrow/agreement contract ABIs (Milestone 5)
+  src/lib/web3/      wagmi/viem wallet + chain config (Milestone 5)
+  src/hooks/         App-specific React hooks (added as needed)
+  src/types/         Shared TypeScript types
+  config/            Arc Testnet + contract address configuration
 ```
 
-State machine: `CREATED → ACCEPTED → FUNDED → WORK_SUBMITTED → UNDER_REVIEW → APPROVED/DISPUTED → RELEASED/REFUNDED`
+## Tech stack
 
-## Why this needs GenLayer specifically
+- Next.js (App Router) + TypeScript
+- Tailwind CSS v4
+- Framer Motion, Lucide icons
+- wagmi + viem for wallet/chain interaction (not yet wired up)
+- GenLayer Intelligent Contracts for evaluation (adapter scaffolded, not yet wired up)
+- Deployment target: Vercel
 
-A normal smart contract can hold funds and check a signature. It cannot read a URL and judge whether the content inside satisfies a natural-language brief — that requires an LLM, and a plain oracle call would mean trusting one server's opinion. GenLayer's Intelligent Contracts run that judgment across independent validator nodes and only accept the result if they reach consensus (the equivalence principle), so no single party — buyer, seller, or a centralized arbiter — controls the verdict.
-
-## Contract methods
-
-| Method | Caller | What it does |
-|---|---|---|
-| `create_agreement(seller, task, deliverables, acceptance_criteria, payment_gwei, deadline)` | Buyer | Creates the agreement |
-| `accept_agreement(id)` | Seller | Accepts the job |
-| `fund_agreement(id)` | Buyer (payable) | Locks GEN in escrow |
-| `submit_work(id, url, evidence)` | Seller | Submits deliverable, triggers AI evaluation |
-| `buyer_resolve_dispute(id, release_to_seller, note)` | Buyer | Manual override on a disputed agreement |
-| `cancel_agreement(id)` | Buyer | Cancel/refund before or after funding, before submission |
-| `get_agreement(id)`, `get_agent(addr)`, `get_agreements_for_buyer/seller(addr)`, `get_disputed_agreements()` | Anyone | Views |
-
-## Reputation
-
-Each `AgentProfile` tracks `completed_jobs`, `successful_jobs`, `disputes`, and a `reputation` score (0–1000, starts at 500). Approval nudges reputation up; a dispute pulls it down. Simple by design for the MVP — the storage shape leaves room for weighting by job size or buyer reputation later without a migration.
-
----
-
-## Deploying
-
-### Fastest: GenLayer Studio (browser, no local setup)
-
-1. Get testnet GEN from the [Bradbury faucet](https://testnet-faucet.genlayer.foundation).
-2. Open [studio.genlayer.com](https://studio.genlayer.com), switch network to Bradbury.
-3. Paste the contents of `contract/agentshield.py`, deploy (no constructor args).
-4. Copy the deployed contract address.
-
-### CLI
+## Local setup
 
 ```bash
-npm install -g genlayer
-genlayer network set testnet-bradbury   # exact subcommand may vary by CLI version —
-                                         # confirm at docs.genlayer.com/api-references/genlayer-cli
-genlayer deploy --contract contract/agentshield.py
-```
-
-### After deploying
-
-Set the address in the frontend:
-
-```bash
-cd frontend
-cp .env.example .env
-# edit .env: VITE_CONTRACT_ADDRESS=0x...
-```
-
-## Running the frontend locally
-
-```bash
-cd frontend
+cd web
 npm install
 npm run dev
 ```
 
-## Deploying the frontend to Vercel
+App runs at `http://localhost:3000`.
 
-This repo includes `vercel.json` at the root. Import the repo in Vercel, and it will run `cd frontend && npm install && npm run build` and serve `frontend/dist` automatically — no manual config needed beyond setting `VITE_CONTRACT_ADDRESS` (and optionally `VITE_GL_NETWORK`) as environment variables in the Vercel project settings.
+```bash
+npm run lint    # ESLint
+npm run build   # Production build + TypeScript check
+npm run start   # Serve the production build
+```
 
-## Network
+## Environment variables
 
-| | |
-|---|---|
-| GenLayer RPC | `https://rpc-bradbury.genlayer.com` |
-| Chain ID | 4221 |
-| Explorer | `https://explorer-bradbury.genlayer.com` |
-| Faucet | `https://testnet-faucet.genlayer.foundation` |
+None are required yet — the landing page has no live integrations. As later
+milestones add wallet and GenLayer support, required variables will be
+documented here and added to `web/.env.example`. No secret or private key is
+ever read on the client; anything sensitive stays in server routes only.
 
-## Security notes
+## Arc Testnet / USDC / GenLayer configuration
 
-- No private keys anywhere in this repo. The frontend connects via the browser wallet (`window.ethereum`); nothing is signed server-side.
-- All monetary state transitions (`fund_agreement`, `_release`, `_refund`) live only in the contract — the frontend never simulates a payment.
-- Buyer-side dispute override exists deliberately: an AI verdict is advisory-binding by default, never unappealable.
+Chain ID, USDC address, the AgentShield escrow contract address, and the Arc
+Testnet explorer URL live in `web/config/chains.ts`. All are currently
+`undefined` and the app is in **mock mode** (`IS_MOCK_MODE = true`). Real
+values get filled in once the escrow contract is deployed and the official
+Arc Testnet configuration is confirmed — the app must never fabricate a
+transaction hash or balance in the meantime.
+
+## Demo mode vs. live mode
+
+The GenLayer evaluation adapter lives behind `GenLayerEvaluator` in
+`web/src/lib/genlayer/index.ts`. `mockEvaluator.ts` is a demo implementation
+that always returns a result explicitly marked `isDemo: true`. Swapping to a
+live GenLayer network connection means implementing the same interface and
+pointing the app at it — no UI code should need to change. The UI must never
+present a demo evaluation as if it were live.
+
+## Deploying to Vercel
+
+1. Set the project root to `web/` in Vercel's project settings.
+2. `npm install` / `npm run build` are Vercel's defaults and work unmodified.
+3. No environment variables are required for Milestone 1.
+
+## Troubleshooting
+
+- **Fonts fail to load during build:** `next/font/google` needs outbound
+  access to `fonts.googleapis.com` at build time. This works on Vercel; if
+  building somewhere with restricted network egress, allow that domain.
+
+## Contract
+
+`contract/agentshield.py` is the GenLayer Intelligent Contract implementing
+the agreement state machine (CREATED → ACCEPTED → FUNDED → UNDER_REVIEW →
+APPROVED/DISPUTED → RELEASED/REFUNDED) with LLM-based evaluation and
+reputation tracking. This predates the Next.js rebuild and is the basis for
+the live GenLayer integration in a later milestone.

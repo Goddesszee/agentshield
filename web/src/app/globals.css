@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- Color tokens ---- */
+  --color-base: #060811;
+  --color-base-raised: #0a0e1a;
+  --color-panel: #0d1220;
+  --color-panel-border: rgba(233, 238, 250, 0.08);
+  --color-panel-border-strong: rgba(233, 238, 250, 0.16);
+
+  --color-text: #e9eefa;
+  --color-text-muted: #8b93a8;
+  --color-text-faint: #545d72;
+
+  --color-blue: #3b74f2;
+  --color-blue-dim: #1c3a80;
+  --color-violet: #7c5cff;
+  --color-violet-dim: #372a80;
+
+  --color-approved: #35c98c;
+  --color-dispute: #e0a53c;
+  --color-refund: #6b7280;
+
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+}
+
+* {
+  border-color: var(--color-panel-border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-base);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-blue-dim);
+  color: var(--color-text);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Faint grid + radial glow backdrop, used once on the page root, not per-section */
+.bg-signal {
+  background-image:
+    radial-gradient(ellipse 900px 500px at 78% 0%, rgba(59, 116, 242, 0.14), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 15% 15%, rgba(124, 92, 255, 0.10), transparent 60%),
+    linear-gradient(rgba(233,238,250,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(233,238,250,0.035) 1px, transparent 1px);
+  background-size: auto, auto, 64px 64px, 64px 64px;
+  background-position: 0 0, 0 0, -1px -1px, -1px -1px;
+  -webkit-mask-image: linear-gradient(to bottom, black, black 65%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black, black 65%, transparent 100%);
+}
+
+.glass {
+  background: linear-gradient(180deg, rgba(233,238,250,0.05), rgba(233,238,250,0.015));
+  border: 1px solid var(--color-panel-border);
+  backdrop-filter: blur(20px);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

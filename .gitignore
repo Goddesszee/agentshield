@@ -3,3 +3,8 @@ dist/
 .env
 .env.local
 .DS_Store
+.next/
+web/node_modules/
+web/.next/
+web/.env
+web/.env.local
