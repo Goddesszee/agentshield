@@ -38,7 +38,7 @@ export function Hero() {
               Create an Agreement
             </a>
             <a
-              href="#demo"
+              href="/dashboard"
               className="rounded-full border border-[var(--color-panel-border-strong)] px-5 py-3 text-[14px] font-medium text-[var(--color-text)] transition-colors hover:border-[var(--color-violet)]/50"
             >
               Explore Demo
